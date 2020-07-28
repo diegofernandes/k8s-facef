@@ -8,15 +8,16 @@ import (
 	"time"
 )
 
-var port = flag.Int("port", 8080, "listen port")
+var port = flag.Int("port", 8090, "listen port")
 
 func greet(w http.ResponseWriter, r *http.Request) {
-	msg := fmt.Sprintf("Hello World! %s", time.Now())
+	msg := fmt.Sprintf("Bye World! %s", time.Now())
 
 	fmt.Fprint(w, msg)
 }
 
 func main() {
+	flag.Parse()
 	addr := fmt.Sprintf(":%v", *port)
 	log.Printf("Starting hello api on %s", addr)
 	http.HandleFunc("/", greet)
