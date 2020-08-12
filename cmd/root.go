@@ -40,9 +40,24 @@ var rootCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
+		var basicUser = viper.GetString("auth_user")
+		var basicPass = viper.GetString("auth_pass")
+
 		addr := fmt.Sprintf(":%v", viper.GetInt("port"))
 		log.Printf("Starting hello api on %s", addr)
+		if basicUser != "" {
+			log.Printf("Using HTTP basic auth ")
+		}
+
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+
+			if basicUser != "" {
+				if username, password, ok := r.BasicAuth(); !ok || username != basicUser || password != basicPass {
+					log.Printf("User Unauthorized! Got username=%s password=%s Should be username=%s password=%s", username, password, basicUser, basicPass)
+					w.WriteHeader(http.StatusUnauthorized)
+					return
+				}
+			}
 			msg := fmt.Sprintf(viper.GetString("message"), time.Now().Format(viper.GetString("time_layout")))
 
 			fmt.Fprint(w, msg)
@@ -71,6 +86,8 @@ func init() {
 	rootCmd.Flags().String("time_layout", time.UnixDate, "time layout used in the message")
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().String("auth_user", "", "HTTP basic auth username")
+	rootCmd.Flags().String("auth_pass", "", "HTTP basic auth password")
 
 	viper.BindPFlags(rootCmd.PersistentFlags())
 
