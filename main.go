@@ -1,25 +1,22 @@
+/*
+Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	"flag"
-	"fmt"
-	"log"
-	"net/http"
-	"time"
-)
-
-var port = flag.Int("port", 8090, "listen port")
-
-func greet(w http.ResponseWriter, r *http.Request) {
-	msg := fmt.Sprintf("Bye World! %s", time.Now())
-
-	fmt.Fprint(w, msg)
-}
+import "github.com/diegofernandes/k8s-facef/cmd"
 
 func main() {
-	flag.Parse()
-	addr := fmt.Sprintf(":%v", *port)
-	log.Printf("Starting hello api on %s", addr)
-	http.HandleFunc("/", greet)
-	log.Println(http.ListenAndServe(addr, nil))
+	cmd.Execute()
 }
