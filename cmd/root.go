@@ -40,6 +40,8 @@ var rootCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
+		var started = time.Now()
+
 		var basicUser = viper.GetString("auth_user")
 		var basicPass = viper.GetString("auth_pass")
 
@@ -49,7 +51,19 @@ var rootCmd = &cobra.Command{
 			log.Printf("Using HTTP basic auth ")
 		}
 
-		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		mux := http.NewServeMux()
+
+		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+			duration := time.Now().Sub(started)
+			if duration.Seconds() > 30 {
+				w.WriteHeader(500)
+				w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds())))
+			} else {
+				w.WriteHeader(200)
+				w.Write([]byte("ok"))
+			}
+		})
+		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
 			if basicUser != "" {
 				if username, password, ok := r.BasicAuth(); !ok || username != basicUser || password != basicPass {
@@ -62,7 +76,7 @@ var rootCmd = &cobra.Command{
 
 			fmt.Fprint(w, msg)
 		})
-		log.Println(http.ListenAndServe(addr, nil))
+		log.Println(http.ListenAndServe(addr, mux))
 
 	},
 }
