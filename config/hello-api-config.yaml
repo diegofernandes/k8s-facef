@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: hello-api-config
+data:
+  # property-like keys; each key maps to a simple value
+  port: "8080"
+  config_file: "/config/hello-api.yaml"
+  #
+  # file-like keys
+  hello-api.yaml: |
+    message: Olá amiguinho, agora são %s!
+    time_layout: "15:04"
