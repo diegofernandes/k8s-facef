@@ -44,7 +44,7 @@ kubectl delete -f file.yaml - apaga todos os recursos descritos no arquivo
 kubectl autoscale deployment hello-api-deployment --min 1 --max 10 --cpu-percent 50 - cria um autoscale para o deployment
 
 
-minik8s enable metrics-server - habilita o metric-server
+microk8s enable metrics-server - habilita o metric-server
 minikube addons enable metrics-server - habilita o metric-server
 
 
