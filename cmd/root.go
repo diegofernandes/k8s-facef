@@ -20,6 +20,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -40,8 +41,6 @@ var rootCmd = &cobra.Command{
 
 	Run: func(cmd *cobra.Command, args []string) {
 
-		var started = time.Now()
-
 		var basicUser = viper.GetString("auth_user")
 		var basicPass = viper.GetString("auth_pass")
 
@@ -54,14 +53,10 @@ var rootCmd = &cobra.Command{
 		mux := http.NewServeMux()
 
 		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
-			duration := time.Now().Sub(started)
-			if duration.Seconds() > 30 {
-				w.WriteHeader(500)
-				w.Write([]byte(fmt.Sprintf("error: %v", duration.Seconds())))
-			} else {
-				w.WriteHeader(200)
-				w.Write([]byte("ok"))
-			}
+
+			w.WriteHeader(200)
+			w.Write([]byte("ok"))
+
 		})
 		mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
@@ -72,6 +67,10 @@ var rootCmd = &cobra.Command{
 					return
 				}
 			}
+
+			for i := 0; i < 999999999; i++ {
+			}
+			runtime.Gosched()
 			msg := fmt.Sprintf(viper.GetString("message"), time.Now().Format(viper.GetString("time_layout")))
 
 			fmt.Fprint(w, msg)
