@@ -1,0 +1,66 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: hello-api-deployment
+spec:
+  selector:
+    matchLabels:
+      app: hello-api
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: hello-api
+    spec:
+      containers:
+      - name: hello-api
+        image: diegofernandes/k8s-facef:0.0.6
+        imagePullPolicy: Always
+        command: ["/bin/app"]
+        args: ["--config", "$(CONFIG_FILE)"]
+        resources:
+          limits:
+            cpu: "100m"
+            memory: "200Mi"
+          requests:
+            cpu: "50m"
+            memory: "200Mi"
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+            httpHeaders:
+            - name: Custom-Header
+              value: Awesome
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        env:
+          # Define the environment variable
+          - name: PORT # Notice that the case is different here
+                                       # from the key name in the ConfigMap.
+            valueFrom:
+              configMapKeyRef:
+                name: hello-api-config          # The ConfigMap this value comes from.
+                key: port # The key to fetch.
+          - name: CONFIG_FILE
+            valueFrom:
+              configMapKeyRef:
+                name: hello-api-config
+                key: config_file
+        volumeMounts:
+        - name: config
+          mountPath: "/config"
+          readOnly: true
+      volumes:
+      # You set volumes at the Pod level, then mount them into containers inside that Pod
+      - name: config
+        configMap:
+          # Provide the name of the ConfigMap you want to mount.
+          name: hello-api-config
+          # An array of keys from the ConfigMap to create as files
+          items:
+          - key: "hello-api.yaml"
+            path: "hello-api.yaml"
+        
