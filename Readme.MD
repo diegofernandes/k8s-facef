@@ -35,6 +35,22 @@ kubectl set image deployment hello-api hello-api=diegoferandens/k8s-facef:0.0.2 
 kubectl logs -f pods <pod_id> - mostra os logs do pod e acompanha novas saidas de logs
 kubectl logs -p <pod_id> - mostra os logs antes do restart do pod/container
 kubectl describe pod <pod_id> - exibe todas as informacoes de um pod
+kubectl top pod - exibe os recurso utilizado.
+
+kubectl apply -f file.yaml - aplica todos os recursos descritos no arquivo
+kubectl diff -f file.yaml - exibe as diferenças entre o cluster e o arquivo
+kubectl delete -f file.yaml - apaga todos os recursos descritos no arquivo
+
+kubectl autoscale deployment hello-api-deployment --min 1 --max 10 --cpu-percent 50 - cria um autoscale para o deployment
+
+
+minik8s enable metrics-server - habilita o metric-server
+minikube addons enable metrics-server - habilita o metric-server
+
+
+kubectl run -it --rm load-generator --image=busybox /bin/sh
+while true; do wget -q -O- http://hello-api-service:8080; done
+
 ```
 
 
